@@ -9,6 +9,7 @@ FPS = 60
 TILE = 30
 
 
+
 def load_layout(name):
     return (LEVELS_DIR / name).read_text().splitlines()
 
@@ -23,6 +24,19 @@ def draw_board(board, screen):
             elif tile == ".":
                 pygame.draw.circle(screen, (255, 0, 0), (x + TILE // 2, y + TILE // 2), 3)
 
+def game_win(score , dots):
+    if score == dots:
+        return True
+    return False
+
+def collect_points(board, score, r_i, c_i):
+   
+    if board.grid[r_i][c_i] == ".":
+        board.grid[r_i][c_i] = " "
+        score += 1
+    return score
+
+
 
 def main():
     layout = load_layout("level1.txt")
@@ -30,8 +44,12 @@ def main():
 
     WIDTH = len(board.grid[0]) * TILE
     HEIGHT = len(board.grid) * TILE
+    SCORE = -1
+    MAX_SCORE = board.dots_count() - 1
 
     pygame.init()
+    score_d = pygame.font.SysFont(None, 36)
+    win_d = pygame.font.SysFont(None, 72)
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Pacman")
     clock = pygame.time.Clock()
@@ -62,10 +80,18 @@ def main():
             if not board.is_wall(next_y//TILE,x//TILE):
                 y = next_y
 
+        SCORE = collect_points(board,SCORE,y//TILE,x//TILE)
+
         screen.fill((0, 0, 0))
         draw_board(board, screen)
         pygame.draw.circle(screen, (255, 255, 0), (x, y), 10)
+        score_surface = score_d.render(f"Score: {SCORE}", True, (255, 255, 255))
+        screen.blit(score_surface, (10, 10))
+        if game_win(SCORE,MAX_SCORE):
+            message = win_d.render("YOU WIN", True, (212, 175, 55))
+            screen.blit(message, message.get_rect(center=(WIDTH // 2, HEIGHT // 2)))
         pygame.display.flip()
+        
 
         clock.tick(FPS)
 

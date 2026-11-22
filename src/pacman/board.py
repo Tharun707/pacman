@@ -13,7 +13,7 @@ class Board:
         #checking for wall"#"
         return self.grid[row][col] == "#"
 
-    def dots_remaining(self) -> int:
+    def dots_count(self) -> int:
         count = 0
         for i in self.grid:
             count += i.count(".")
